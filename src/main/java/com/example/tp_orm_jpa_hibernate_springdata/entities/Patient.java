@@ -25,5 +25,4 @@ public class Patient implements Serializable {
     private Date dateNaissance;
     private boolean malade;
     private int score;
-
 }
