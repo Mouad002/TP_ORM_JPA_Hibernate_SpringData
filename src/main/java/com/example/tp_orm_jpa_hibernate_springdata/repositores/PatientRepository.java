@@ -8,8 +8,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
-    @Transactional
-    @Modifying
-    @Query("update Patient p set p.score = :score where p.id = :id")
-    public void updatePatientScoreById(@Param("id") long id, @Param("score") double score);
+//    @Transactional
+//    @Modifying
+//    @Query("update Patient p set p.score = :score where p.id = :id")
+//    public void updatePatientScoreById(@Param("id") long id, @Param("score") double score);
+
+    public Patient findByNom(String name);
 }
