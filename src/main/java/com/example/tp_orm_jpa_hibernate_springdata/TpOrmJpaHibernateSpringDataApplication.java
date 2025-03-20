@@ -1,11 +1,9 @@
 package com.example.tp_orm_jpa_hibernate_springdata;
 
 import com.example.tp_orm_jpa_hibernate_springdata.entities.*;
-import com.example.tp_orm_jpa_hibernate_springdata.repositores.ConsultationRepository;
-import com.example.tp_orm_jpa_hibernate_springdata.repositores.MedecinRepository;
-import com.example.tp_orm_jpa_hibernate_springdata.repositores.PatientRepository;
-import com.example.tp_orm_jpa_hibernate_springdata.repositores.RendezVousRepository;
+import com.example.tp_orm_jpa_hibernate_springdata.repositores.*;
 import com.example.tp_orm_jpa_hibernate_springdata.services.IHospitalService;
+import com.example.tp_orm_jpa_hibernate_springdata.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @SpringBootApplication
@@ -59,8 +58,10 @@ public class TpOrmJpaHibernateSpringDataApplication {
 ////        patientRepository.delete(patient);
 //    }
     @Bean
-    CommandLineRunner start(IHospitalService hospitalService) {
+    CommandLineRunner start(IHospitalService hospitalService, UserService userService) {
         return args -> {
+
+            // the block of @OneToMany @ManyToOne @OneToOne
             Stream.of("mouad", "monim", "amine")
                     .forEach(name -> {
                         Patient p = new Patient();
@@ -100,6 +101,42 @@ public class TpOrmJpaHibernateSpringDataApplication {
                     .rapport("report of the consulting service")
                     .build();
             hospitalService.saveConsultation(c);
+
+            // the block of @ManyToMany
+
+            User user1 = new User();
+            user1.setUserName("xavier");
+            user1.setPassword("X12345");
+            userService.addNewUser(user1);
+
+            User user2 = new User();
+            user2.setUserName("admin1");
+            user2.setPassword("V45678");
+            userService.addNewUser(user2);
+
+            Stream.of("STUDENT", "ADMIN", "USER").forEach(name -> {
+                Role role = new Role();
+                role.setRoleName(name);
+                userService.addNewRole(role);
+            });
+
+
+            userService.addRoleToUser("xavier","STUDENT");
+            userService.addRoleToUser("xavier","USER");
+            userService.addRoleToUser("admin1","ADMIN");
+            userService.addRoleToUser("admin1","USER");
+
+            try {
+                User user = userService.authenticate("xavier","X12345");
+                System.out.println(user.getUserId());
+                System.out.println(user.getUserName());
+                System.out.println("Roles => ");
+                Stream.of(user.getRoles()).forEach(role -> {
+                    System.out.println(role);
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         };
     }
 }
